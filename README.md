@@ -36,7 +36,7 @@ classifier.classify_raw("one two three") => :odd
 
 ## Bags (of words)
 
-A bag of words is a just a Hash of word counts (a multi-set of word frequencies, to ML folk).  This makes a useful abstraction because you can use it with more than one kind of classifier, and because the bag provides a natural location for various kinds of pre-processing you might want to do to the words (features) of the text before training with or classifying them.  
+A bag of words is a just a Hash of word counts (a multi-set of word frequencies, to ML folk).  This makes a useful abstraction because you can use it with more than one kind of classifier, and because the bag provides a natural location for various kinds of pre-processing you might want to do to the words (features) of the text before training with or classifying them.  Although a single bag can contain as many documents as you want, in practice it's a good idea to treat word bags as corresponding to a single document.
 
 A handful of classes are provided:
 
@@ -163,6 +163,41 @@ docs.each_doc do |d|
 end
 ```
 
+## Feature thresholds 
+
+A method on the classifier is provided to prune infrequently seen features.  This is often one of the first things recommended for improving the accuracy of a classifier in real world applications.  Note that when you prune features, there's no un-pruning afterwards - so be sure you actually want to do it!
+
+
+```ruby
+classifier = Yanbi.default(:even, :odd)
+
+#...tons of training happens here...
+
+#we now have thousands of documents.  Ignore any words we haven't
+#seen at least a dozen times
+
+classifier.set_significance(12)
+
+#actually, the 'odd' category is especially noisy, so let's make
+#that two dozen for odd items
+
+classifier.set_significance(24, :odd)
+```
+
+## Persisting
+
+After going to all of the trouble of training a classifier on a large corpus, it would be very useful to save it to disk for later use.  You can do just that with the appropriately named save and load functions:
+
+```ruby
+classifier.save('testclassifier')
+
+#...some time later
+
+newclassifier = Yanbi::Bayes.load('testclassifier')
+```
+
+Note that an .obj extension is added to saved classifiers by default - no need to explicitly include it.
+
 ## Putting it all together
 
 ```ruby
@@ -176,6 +211,38 @@ other.add_file('biglistofotherstuff.txt', '@@@@')
 
 stuff.each_doc {|d| classifier.train(:stuff, d)}
 otherstuff.each_doc {|d| classifier.train(:otherstuff, d)}
+
+#...classify all the things....
+```
+
+A slightly fancier example:
+
+```ruby
+
+STOP_WORDS = %w(in the a and at of)
+
+#classify using stemmed words
+classifier = Yanbi::Bayes.new(Yanbi::StemmedWordBag, :stuff, :otherstuff)
+
+#create our corpora
+stuff = Yanbi::Corpus.new(Yanbi::StemmedWordBag)
+stuff.add_file('biglistofstuff.txt', '****')
+
+other = Yanbi::Corpus.new(Yanbi::StemmedWordBag)
+other.add_file('biglistofotherstuff.txt', '@@@@')
+
+#get rid of those nasty stop words
+stuff.each_doc {|d| d.remove(STOP_WORDS}
+otherstuff.each_doc {|d| d.remove(STOP_WORDS}
+
+#train away!
+stuff.each_doc {|d| classifier.train(:stuff, d)}
+otherstuff.each_doc {|d| classifier.train(:otherstuff, d)}
+
+#get rid of the long tail
+classifier.set_significance(50)
+
+#...classify all the things....
 ```
 
 ## Contributing

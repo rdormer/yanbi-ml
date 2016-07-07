@@ -94,4 +94,17 @@ shared_examples_for "A Classifier" do
     allow(buffer).to receive(:write).with(YAML::dump(@classifier))
     @classifier.save('testfile')
   end
+
+  it 'should be able to deserialize itself' do
+    buffer = StringIO.new(@classifier.to_yaml)
+    allow(File).to receive(:read).with('testfile.obj').and_return(buffer)
+    test = described_class.load('testfile')
+    expect(test.to_yaml).to eq(@classifier.to_yaml)
+  end
+
+  it 'should raise an error if deserializing the wrong object' do
+    buffer = StringIO.new(String.new.to_yaml)
+    allow(File).to receive(:read).with('testfile.obj').and_return(buffer)
+    expect{described_class.load('testfile')}.to raise_error(LoadError)
+  end
 end

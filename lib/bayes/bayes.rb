@@ -34,6 +34,18 @@ module Yanbi
       self.new(WordBag, *categories)
     end
 
+    def self.load(fname)
+      c = YAML::load(File.read(fname + ".obj"))
+      raise LoadError unless c.is_a? Yanbi::Bayes
+      c
+    end
+
+    def save(name)
+      File.open(name + ".obj", 'w') do |out|
+         YAML.dump(self, out)
+      end
+    end
+ 
     def train(category, document)
       cat = category.to_sym
       @document_counts[cat] += 1    
@@ -69,13 +81,7 @@ module Yanbi
     def newdoc(doc)
       Yanbi.const_get(@bag_class).new(doc)
     end
-
-    def save(name)
-      File.open(name + ".obj", 'w') do |out|
-         YAML.dump(self, out)
-      end
-    end
-  
+ 
     private
   
     def cond_prob(cat, document)
