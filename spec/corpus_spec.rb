@@ -1,3 +1,7 @@
+# Author::    Robert Dormer (mailto:rdormer@gmail.com)
+# Copyright:: Copyright (c) 2016 Robert Dormer
+# License::   MIT
+
 require File.dirname(__FILE__) + '/test_helper'
 
 testfile1 = <<-EOS

@@ -1,3 +1,6 @@
+# Author::    Robert Dormer (mailto:rdormer@gmail.com)
+# Copyright:: Copyright (c) 2016 Robert Dormer
+# License::   MIT
 
 shared_examples_for "A Classifier" do
   before(:each) do
