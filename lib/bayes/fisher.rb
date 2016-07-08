@@ -5,16 +5,10 @@
 module Yanbi
 
   class Fisher < Bayes
-  
-    def classify(text)
-      max_score(text) do |cat, doc|
-        fisher_score(cat, doc)
-      end
-    end
-  
+   
     private
   
-    def fisher_score(category, document)
+    def score(category, document)
       features = document.words.uniq
       probs = features.map {|x| weighted_prob(x, category)}
       pscores = probs.reduce(&:*)
@@ -30,9 +24,8 @@ module Yanbi
     end
 
     def word_prob(cat, word)
-      all_word_count = @category_counts[cat].values.reduce(&:+)
       count = @category_counts[cat].has_key?(word) ? @category_counts[cat][word].to_f : 0 
-      count / all_word_count
+      count / @category_sizes[cat]
     end
 
     def weighted_prob(word, category, basicprob=nil, weight=1.0, ap=0.5)

@@ -20,6 +20,7 @@ module Yanbi
       @categories = categories
       @category_counts = {}
       @document_counts = {}
+      @category_sizes = {}
   
       @categories.each do |category|
         cat = category.to_sym
@@ -54,11 +55,13 @@ module Yanbi
         @category_counts[cat][word] ||= 0
         @category_counts[cat][word] += 1
       end
+
+      @category_sizes[cat] = category_size(cat)
     end
   
     def classify(document)
       max_score(document) do |cat, doc|
-        cond_prob(cat, doc)
+        score(cat, doc)
       end
     end
 
@@ -75,6 +78,7 @@ module Yanbi
       categories.each do |category|
         cat = category.to_sym
         @category_counts[cat].reject! {|k,v| v < cutoff}
+        @category_sizes[cat] = category_size(cat)
       end
     end
   
@@ -84,16 +88,15 @@ module Yanbi
  
     private
   
-    def cond_prob(cat, document)
+    def score(cat, document)
       total_docs = @document_counts.values.reduce(:+).to_f
       document_prob = document.words.uniq.map {|word| word_prob(cat, word)}.reduce(:+)     
       document_prob + Math.log(@document_counts[cat] / total_docs) 
     end
   
     def word_prob(cat, word)
-      all_word_count = @category_counts[cat].values.reduce(&:+)
       count = @category_counts[cat].has_key?(word) ? @category_counts[cat][word].to_f : 0.1 
-      Math.log(count / all_word_count)
+      Math.log(count / @category_sizes[cat])
     end
   
     def max_score(document)
@@ -107,7 +110,10 @@ module Yanbi
       i = scores.rindex(scores.max)
       @categories[i]
     end
-  
+
+    def category_size(cat)
+      @category_counts[cat].values.reduce(&:+).to_i
+    end
   end
 
 end

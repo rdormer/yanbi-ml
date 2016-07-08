@@ -110,4 +110,10 @@ shared_examples_for "A Classifier" do
     allow(File).to receive(:read).with('testfile.obj').and_return(buffer)
     expect{described_class.load('testfile')}.to raise_error(LoadError)
   end
+
+  it 'should allow pruning of features' do
+    @classifier.train(:even, @evenbag)
+    @classifier.set_significance(2)
+    expect(@classifier.instance_eval('@category_counts[:odd].empty?')).to be true
+  end
 end
