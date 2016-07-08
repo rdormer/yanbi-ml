@@ -1,6 +1,6 @@
 # YANBI-ML
 
-Yet Another Naive Bayes Implementation
+Yet Another Naive Bayes Implementation - Bayes and Fisher document classifiers
 
 ## Installation
 
@@ -33,6 +33,24 @@ classifier.train_raw(:odd, "one three five seven")
 
 classifier.classify_raw("one two three") => :odd
 ```
+
+## What is a Fisher Classifier?
+
+An alternative to the standard Bayesian classifier that can also give very accurate results.  A Bayesian classifier works by computing a single, document-wide probability for each class that a document might belong to.  A Fisher classifer, by contrast, will compute a probability for each individual feature in a document.  If the document does not belong to a given class, then you would expect to get a random distribution of probabilities for the features in the document.  In fact, the eponymous Fisher showed that you would generally get a *chi squared distribution* of probabilities.  If the document does belong to a given class, you would expect the probabilities to be skewed towards higher probabilities, instead of being randomly distributed. A Fisher classifier uses the Fisher statistical method (p-value) to determine the degree to which the features in the document diverge from the expected random probability. 
+
+## I don't care, I just want to use it!
+
+Fortunately the interface is pretty consistent:
+
+```ruby
+classifier = Yanbi::Fisher.default(:even, :odd)
+classifier.train_raw(:even, "two four six eight")
+classifier.train_raw(:odd, "one three five seven")
+
+classifier.classify_raw("one two three") => :odd
+```
+
+See?  Easy.
 
 ## Bags (of words)
 
@@ -247,7 +265,7 @@ classifier.set_significance(50)
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/rdormer/yanbi-ml.
+Bug reports, corrections of any tragic mathematical misunderstandings, and pull requests are welcome on GitHub at https://github.com/rdormer/yanbi-ml.
 
 
 ## License

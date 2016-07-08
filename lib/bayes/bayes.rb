@@ -36,7 +36,7 @@ module Yanbi
 
     def self.load(fname)
       c = YAML::load(File.read(fname + ".obj"))
-      raise LoadError unless c.is_a? Yanbi::Bayes
+      raise LoadError unless c.is_a? self 
       c
     end
 
@@ -108,11 +108,6 @@ module Yanbi
       @categories[i]
     end
   
-#    def weighted_prob(word, category, basicprob, weight=1.0, ap=0.5)
-#      #basicprob = word_prob(category, word) if basicprob.nil?
-#      totals = @category_counts.inject(0) {|sum, cat| sum += cat.last[word].to_i}
-#      ((weight * ap) + (totals*basicprob)) / (weight + totals)
-#    end
   end
 
 end

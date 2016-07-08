@@ -1,6 +1,10 @@
+# Author::    Robert Dormer (mailto:rdormer@gmail.com)
+# Copyright:: Copyright (c) 2016 Robert Dormer
+# License::   MIT
+
 module Yanbi
 
-  class Fisher < Yanbi::Bayes
+  class Fisher < Bayes
   
     def classify(text)
       max_score(text) do |cat, doc|
@@ -12,36 +16,31 @@ module Yanbi
   
     def fisher_score(category, document)
       features = document.words.uniq
-      pscores = 1
- 
-
-### 
-#compute weighted probabilities for each word/cat tuple
-#and then multiply them all together...
-##
-
-
-
-      features.each do |word|
-        clf = word_prob(category, word)
-        freqsum = @categories.reduce(0) {|sum, x| sum + word_prob(x, word)}
-        pscores *= (clf / freqsum) if clf > 0
-      end
-  
-#####
-
-
-#compute fisher factor of pscores
+      probs = features.map {|x| weighted_prob(x, category)}
+      pscores = probs.reduce(&:*)
       score = -2 * Math.log(pscores)
-
-#this is okay
       invchi2(score, features.count * 2)
     end
-  
-    def word_prob(cat, word)
-      @category_counts[cat][word].to_f / @document_counts[cat]  
+
+    def category_prob(cat, word)
+      wp = word_prob(cat, word)
+      sum = @categories.inject(0) {|s,c| s + word_prob(c, word)}
+      return 0 if sum.zero?
+      wp / sum
     end
-  
+
+    def word_prob(cat, word)
+      all_word_count = @category_counts[cat].values.reduce(&:+)
+      count = @category_counts[cat].has_key?(word) ? @category_counts[cat][word].to_f : 0 
+      count / all_word_count
+    end
+
+    def weighted_prob(word, category, basicprob=nil, weight=1.0, ap=0.5)
+      basicprob = category_prob(category, word)
+      totals = @category_counts.inject(0) {|sum, cat| sum += cat.last[word].to_i}
+      ((weight * ap) + (totals*basicprob)) / (weight + totals)
+    end
+
     def invchi2(chi, df)
       m = chi / 2.0
       sum = Math.exp(-m)
