@@ -60,6 +60,7 @@ module Yanbi
     end
   
     def classify(document)
+      return nil if document.empty?
       max_score(document) do |cat, doc|
         score(cat, doc)
       end

@@ -91,6 +91,12 @@ shared_examples_for "A Classifier" do
     expect(raw.classify_raw('two four')).to eq :even
   end
 
+  it 'should return nil if passed an empty document' do
+    empty = @classifier.newdoc('')
+    expect(@classifier.classify(empty)).to be_nil
+    expect(@classifier.classify_raw('')).to be_nil
+  end
+
   it 'should be able to serialize itself' do
     buffer = StringIO.new
     allow(File).to receive(:open).with('testfile.obj', 'w').and_yield(buffer)
