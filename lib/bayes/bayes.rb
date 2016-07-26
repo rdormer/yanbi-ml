@@ -61,9 +61,14 @@ module Yanbi
   
     def classify(document)
       return nil if document.empty?
-      max_score(document) do |cat, doc|
-        score(cat, doc)
-      end
+      weights = scores(document)
+      weights.max_by(&:last).first
+    end
+
+    def scores(document)
+      scores = {}
+      @categories.each {|c| scores[c] = score(c, document)}
+      scores
     end
 
     def train_raw(category, text)
@@ -72,6 +77,10 @@ module Yanbi
 
     def classify_raw(text)
       classify(self.newdoc(text))
+    end
+
+    def scores_raw(text)
+      scores(self.newdoc(text))
     end
   
     def set_significance(cutoff, category=nil)
@@ -100,18 +109,6 @@ module Yanbi
       Math.log(count / @category_sizes[cat])
     end
   
-    def max_score(document)
-      scores = [] 
-  
-      @categories.each do |c|
-        score = yield c, document
-        scores << score
-      end
-
-      i = scores.rindex(scores.max)
-      @categories[i]
-    end
-
     def category_size(cat)
       @category_counts[cat].values.reduce(&:+).to_i
     end

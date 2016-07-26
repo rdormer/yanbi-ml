@@ -91,6 +91,14 @@ shared_examples_for "A Classifier" do
     expect(raw.classify_raw('two four')).to eq :even
   end
 
+  it 'should allow access to classifier scores' do
+    doc = @classifier.newdoc('one two three')
+    scores = @classifier.scores(doc) 
+    scores_raw = @classifier.scores_raw('one two three')
+    expect(scores).to eq scores_raw
+    expect(scores.max_by(&:last).first).to eq :odd
+  end
+
   it 'should return nil if passed an empty document' do
     empty = @classifier.newdoc('')
     expect(@classifier.classify(empty)).to be_nil
