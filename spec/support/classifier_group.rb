@@ -108,7 +108,7 @@ shared_examples_for "A Classifier" do
   it 'should be able to serialize itself' do
     buffer = StringIO.new
     allow(File).to receive(:open).with('testfile.obj', 'w').and_yield(buffer)
-    allow(buffer).to receive(:write).with(@classifier.to_yaml)
+    allow(buffer).to receive(:save).with(@classifier.to_yaml)
     @classifier.save('testfile')
   end
 
