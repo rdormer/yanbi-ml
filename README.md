@@ -201,6 +201,17 @@ classifier.set_significance(12)
 
 classifier.set_significance(24, :odd)
 ```
+Additionally, you can call the scores (for word bags) and scores_raw methods to get a hash of the raw numerical category scores for a document:
+
+```ruby
+classifier = Yanbi.default(:even, :odd)
+
+#...tons of training happens here...
+
+classifier.scores_raw('one two three') => {:even => -4.18383, :odd => -2.12391}
+```
+
+Raw numerical scores are useful for those instances where you want to set a threshold for valid classification scores, or implement a minimal difference in scores for a valid classification, or for tie breaking.
 
 ## Persisting
 
@@ -271,3 +282,4 @@ Bug reports, corrections of any tragic mathematical misunderstandings, and pull 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+

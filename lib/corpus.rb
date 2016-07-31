@@ -33,6 +33,8 @@ module Yanbi
       infile = File.open(docpath, 'r')
       raw = infile.read
       infile.close
+
+      raw = raw.encode("UTF-8", invalid: :replace, replace: "")
   
       if delim
         docs = raw.split(delim) 
