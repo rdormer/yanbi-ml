@@ -71,16 +71,32 @@ describe Yanbi::Corpus do
     end
   end
 
-  it 'should comment out enclosing comments' do
-    input_string = "this is a test$$ of how the$$ comments"
-    @corpus.add_doc(input_string, /\$\$.+\$\$/)
-    expect(@corpus.docs.first).to eq("this is a test comments")
+  describe 'commenting' do
+    it 'should comment out enclosing comments' do
+      input_string = "this is a test$$ of how the$$ comments"
+      @corpus.add_doc(input_string, /\$\$.+\$\$/)
+      expect(@corpus.docs.first).to eq("this is a test comments")
+    end
+
+    it 'should comment out line comments' do
+      input_string = "this is a test@ of line comments"
+      @corpus.add_doc(input_string, /@.+$/)
+      expect(@corpus.docs.first).to eq("this is a test")
+    end
   end
 
-  it 'should comment out line comments' do
-    input_string = "this is a test@ of line comments"
-    @corpus.add_doc(input_string, /@.+$/)
-    expect(@corpus.docs.first).to eq("this is a test")
+  describe 'index encoding' do
+    it 'should return indices that map to their corresponding word' do
+      @corpus.add_doc('zero one two three four five')
+      dictionary = @corpus.to_index('five four three two one')
+      expect(dictionary).to eq [5, 4, 3, 2, 1]
+    end
+
+    it 'should return nil for unknown words' do
+      @corpus.add_doc('zero one two three four five')
+      dictionary = @corpus.to_index('five four three two one six')
+      expect(dictionary).to eq [5, 4, 3, 2, 1, nil]
+    end
   end
 
   it 'should drop empty documents' do
