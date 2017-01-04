@@ -58,9 +58,16 @@ module Yanbi
     end
   
     def each_doc
-      @bags.each do |bag|
-        yield bag
+      before = 0
+      after = 0
+
+      @bags.each do |bag, doc|
+        before += bag.words.count
+        yield bag, doc
+        after += bag.words.count
       end
+
+      rebuild_all if before != after
     end
 
     def to_index
@@ -71,6 +78,14 @@ module Yanbi
 
       @index
     end
-  end
 
+    private
+
+    def rebuild_all
+      @all = @all.class.new
+      @bags.each do |bag|
+        @all.add_text bag.words.join(' ')
+      end
+    end
+  end
 end

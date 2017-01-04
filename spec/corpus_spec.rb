@@ -85,6 +85,28 @@ describe Yanbi::Corpus do
     end
   end
 
+  describe 'global word bag' do
+    before(:each) do
+      @corpus.add_doc('the quick brown fox')
+      @corpus.add_doc('jumped over the lazy dog')
+    end
+
+    it 'should have entries for every word encountered' do
+      expect(@corpus.all.words).to eq %w(the quick brown fox jumped over the lazy dog)
+    end
+
+    it 'should add new words encountered' do
+      @corpus.add_doc('also the cat')
+      words = %w(the quick brown fox jumped over the lazy dog also the cat)
+      expect(@corpus.all.words).to eq words
+    end
+
+    it 'should update entries when words are removed' do
+      @corpus.each_doc { |d| d.remove(%w(lazy dog)) }
+      expect(@corpus.all.words).to eq %w(the quick brown fox jumped over the)
+    end
+  end
+
   it 'should drop empty documents' do
     expect{@corpus.add_doc('')}.to change(@corpus, :size).by(0)
     expect{@corpus.add_doc(' ')}.to change(@corpus, :size).by(0)

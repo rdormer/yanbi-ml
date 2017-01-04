@@ -12,6 +12,11 @@ shared_examples_for "A Word Bag" do
     expect(@bag.word_counts).to eq 'first' => 1, 'two' => 2, 'three' => 3
   end
 
+  it 'should have an array of individual words' do
+    @bag.add_text('first second third fourth fifth fifth')
+    expect(@bag.words).to eq %w(first second third fourth fifth fifth)
+  end
+
   it 'should allow removal of tokens' do
     @bag.add_text('good text stop word bad text')
     @bag.remove(%w(stop word))
