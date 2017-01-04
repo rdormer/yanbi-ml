@@ -181,6 +181,33 @@ docs.each_doc do |d|
 end
 ```
 
+There's also a single, global bag of words that contains all of the words seen in every document in the corpus.  This is accessed (surprisingly) through the 'all' attribute.
+
+```ruby
+# Non unique global list of words
+docs.all.words
+
+# Unique global list of words
+docs.all.words.uniq
+```
+
+Note that this global word bag is updated whenever you remove words through by iterating through documents with each_doc.
+
+
+## Dictionaries
+
+Speaking of a global list of words, the corpus class also allows you to capture a snapshot of the unique list of words in a set of documents as a dictionary object.  This object can then be used to encode strings as integer arrays of indices:
+
+```ruby
+my_dictionary = docs.to_index
+
+# Get an integer mapping of the words in this string
+indices = my_dictionary.to_idx('the quick brown fox')
+```
+
+Words not present in the dictionary will be returned as nils.  This is useful for working with other types of classifiers that might not be capable of accepting straight text.
+ 
+
 ## Feature thresholds 
 
 A method on the classifier is provided to prune infrequently seen features.  This is often one of the first things recommended for improving the accuracy of a classifier in real world applications.  Note that when you prune features, there's no un-pruning afterwards - so be sure you actually want to do it!
