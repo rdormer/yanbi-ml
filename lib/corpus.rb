@@ -21,7 +21,7 @@ module Yanbi
   
     def initialize(klass=WordBag)
       @all = klass.new
-      @index = {}
+      @index = nil
       @docs = []
       @bags = []
     end
@@ -53,7 +53,7 @@ module Yanbi
         @bags << @all.class.new(doc)
         @all.add_text doc
         @docs << doc
-        @index = {}
+        @index = nil
       end
     end
   
@@ -63,15 +63,13 @@ module Yanbi
       end
     end
 
-    def to_index(doc)
-      if @index.empty?
+    def to_index
+      if @index.nil?
         w = all.words.uniq
-        i = (0..w.size).to_a
-        w.zip(i).each { |x| @index[x.first] = x.last }
+        @index = Yanbi::Dictionary.new(w, @all.class)
       end
 
-      bag = @all.class.new(doc)
-      bag.words.map { |w| @index[w] }
+      @index
     end
   end
 

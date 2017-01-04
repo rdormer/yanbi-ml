@@ -85,20 +85,6 @@ describe Yanbi::Corpus do
     end
   end
 
-  describe 'index encoding' do
-    it 'should return indices that map to their corresponding word' do
-      @corpus.add_doc('zero one two three four five')
-      dictionary = @corpus.to_index('five four three two one')
-      expect(dictionary).to eq [5, 4, 3, 2, 1]
-    end
-
-    it 'should return nil for unknown words' do
-      @corpus.add_doc('zero one two three four five')
-      dictionary = @corpus.to_index('five four three two one six')
-      expect(dictionary).to eq [5, 4, 3, 2, 1, nil]
-    end
-  end
-
   it 'should drop empty documents' do
     expect{@corpus.add_doc('')}.to change(@corpus, :size).by(0)
     expect{@corpus.add_doc(' ')}.to change(@corpus, :size).by(0)

@@ -13,5 +13,7 @@ Dir[base + "/bayes/**/*.rb"].each do |c|
   require c
 end
 
+require 'dictionary'
 require 'corpus'
 require 'version'
+
